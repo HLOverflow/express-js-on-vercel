@@ -49,8 +49,24 @@ app.get('/healthz', (req, res) => {
   res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() })
 })
 
-app.get('/auth', (req, res) => {
-  res.status(200).json({ status: 'ok', timestamp: new Date().toISOString(), message: 'welcome to my auth method.' })
-})
+// The valid API key from environment variables
+const CLIENT_API_KEY = process.env.CLIENT_API_KEY;
+// Middleware function to check the API key
+function checkApiKey(req, res, next) {
+    // API key can be sent in query parameter 'api_key' or header 'x-api-key'
+    const apiKey = req.headers['X-CLIENT-AUTH'];
+    if (apiKey && apiKey === CLIENT_API_KEY) {
+        // Key is valid, proceed to the next middleware or route handler
+        next();
+    } else {
+        // Key is invalid or missing, send a 403 Forbidden error
+        res.status(403).send('Forbidden: Invalid API Key');
+    }
+}
+
+// Example of applying middleware to a specific protected route
+app.get('/protected1', checkApiKey, (req, res) => {
+    res.send('Hello, authenticated user with a valid API key!');
+});
 
 export default app
