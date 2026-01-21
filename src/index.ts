@@ -49,4 +49,8 @@ app.get('/healthz', (req, res) => {
   res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() })
 })
 
+app.get('/auth', (req, res) => {
+  res.status(200).json({ status: 'ok', timestamp: new Date().toISOString(), message: 'welcome to my auth method.' })
+})
+
 export default app
