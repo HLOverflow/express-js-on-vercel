@@ -6,6 +6,7 @@ const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
 const app = express()
+app.use(express.json())
 
 // Home route - HTML
 app.get('/', (req, res) => {
@@ -55,6 +56,7 @@ const CLIENT_API_KEY = process.env.CLIENT_API_KEY;
 function checkApiKey(req, res, next) {
     // API key can be sent in query parameter 'api_key' or header 'x-api-key'
     const apiKey = req.get('X-CLIENT-AUTH');
+    console.log("INSERT DEBUGGING HERE!")
     if (! apiKey){
         res.status(403).send('Forbidden: Missing API Key');
     } else if(apiKey === CLIENT_API_KEY) {
@@ -69,6 +71,24 @@ function checkApiKey(req, res, next) {
 // Example of applying middleware to a specific protected route
 app.get('/protected1', checkApiKey, (req, res) => {
     res.send('Hello, authenticated user with a valid API key!');
+});
+
+// Example of applying middleware to a specific protected route
+app.post('/protected1', checkApiKey, (req, res) => {
+    console.log("post protected1: " + JSON.stringify(req.body));
+
+    if(!req.body.name){
+        return res.status(400).json({message: 'name is required'});
+    }
+
+    if(req.body.name && req.body.name === "alice" ){
+        res.json({
+            message: 'Alice is welcome'
+        })
+    }else{
+        res.status(404).send('Name is not found');
+    }
+
 });
 
 export default app
